@@ -50,7 +50,7 @@ runs:
           }
     - name: Report invalid repository URL in submission
       if: ${{ steps.get-repo-name.outputs.result == 'failure' && inputs.testMode == 'false' }}
-      uses: pupilfirst/actions/grading@v1
+      uses: pupilfirst/grade-action@v1
       with:
         fail_submission: true
         feedback: |
@@ -71,7 +71,7 @@ runs:
         path: ${{ inputs.repoPath }}
     - name: Report invalid repository URL in submission
       if: ${{ steps.get-repo-name.outputs.result != 'failure' && steps.checkout-repo.outcome != 'success' && inputs.testMode == 'false' }}
-      uses: pupilfirst/actions/grading@v1
+      uses: pupilfirst/grade-action@v1
       with:
         fail_submission: true
         feedback: |
@@ -119,7 +119,7 @@ runs:
           return missingPaths.flat().map(path => "- " + path).join("\n");
     - name: Report invalid repository URL in submission
       if: ${{ steps.verify-structure.outputs.result != '' && inputs.testMode == 'false' }}
-      uses: pupilfirst/actions/grading@v1
+      uses: pupilfirst/grade-action@v1
       with:
         fail_submission: true
         feedback: |
