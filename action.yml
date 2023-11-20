@@ -98,8 +98,6 @@ runs:
       id: verify-structure
       uses: actions/github-script@v6
       with:
-        globs: ${{ inputs.globs }}
-        repoPath: ${{ inputs.repoPath }}
         result-encoding: string
         script: |
           const patterns = core.getMultilineInput("globs", { required: true });
@@ -142,4 +140,5 @@ runs:
         verifyStructureOutput: ${{ steps.verify-structure.outputs.result }}
         result-encoding: string
         script: |
-          return core.getInput("verifyStructureOutput") == "" ? "success" : "failure";
+          const verifyStructureOutput = ${{ steps.verify-structure.outputs.result }};
+          return verifyStructureOutput == "" ? "success" : "failure";
