@@ -10,27 +10,27 @@ jobs:
         uses: actions/checkout@v2
       - name: Action should fail for non GitHub repo URLs
         id: reject-invalid-url
-        uses: ./ # Use the current repo as the action
+        uses: ./
         with:
-          globs: '*.js\n*.md' # Example globs
-          repoPath: https://github.com
+          globs: 'action.yml\nREADME.md'
+          submissionJsonPath: test/invalid-repo.json
           testMode: "true"
       - name: Report result of previous test
         run: |
           if [ "${{ steps.reject-invalid-url.outputs.result }}" != "failure" ]; then
-            echo "Action failed to return `failure` for an invalid URL"
+            echo "Action did not fail for an invalid URL"
             exit 1
           fi
       - name: Action should fail for URL that is points to a resource inside a repo
         id: reject-deep-github-url
-        uses: ./ # Use the current repo as the action
+        uses: ./
         with:
-          globs: '*.js\n*.md' # Example globs
-          repoPath: https://github.com/pupilfirst/check-repo-action/blob/main/README.md
+          globs: 'action.yml\nREADME.md'
+          submissionJsonPath: test/deep-link.json
           testMode: "true"
       - name: Report result of previous test
         run: |
           if [ "${{ steps.reject-deep-github-url.outputs.result }}" != "failure" ]; then
-            echo "Action failed to return `failure` for a folder / file URL within a repo"
+            echo "Action did not fail for a folder / file URL within a repo"
             exit 1
           fi

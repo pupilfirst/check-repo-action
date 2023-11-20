@@ -12,6 +12,10 @@ inputs:
     description: Set to true for debugging
     required: false
     default: "false"
+  submissionJsonPath:
+    description: Path to the submission.json file for testing
+    required: false
+    default: ""
 outputs:
   result:
     description: Returns 'success' if all checks pass.
@@ -28,7 +32,8 @@ runs:
       with:
         result-encoding: string
         script: |
-          const submission = require('./submission.json');
+          const submissionJsonPath = core.getInput("submissionJsonPath");
+          const submission = submissionJsonPath === "" ? require(process.env.GITHUB_WORKSPACE + "/submission.json") : require(process.env.GITHUB_WORKSPACE + "/" + submissionJsonPath);
           const gitURL =  submission.checklist[0].result;
           const regex = /(?:git@|https:\/\/)github.com[:\/]([a-zA-Z0-9\-_.]+\/[a-zA-Z0-9\-_.\/]+)$/g;
           const matches = regex.exec(gitURL);
