@@ -1,0 +1,36 @@
+name: Test the check-repo action
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Action should fail for non GitHub repo URLs
+        id: reject-invalid-url
+        uses: ./ # Use the current repo as the action
+        with:
+          globs: '*.js\n*.md' # Example globs
+          repoPath: https://github.com
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-invalid-url.outputs.result }}" != "failure" ]; then
+            echo "Action failed to return `failure` for an invalid URL"
+            exit 1
+          fi
+      - name: Action should fail for URL that is points to a resource inside a repo
+        id: reject-deep-github-url
+        uses: ./ # Use the current repo as the action
+        with:
+          globs: '*.js\n*.md' # Example globs
+          repoPath: https://github.com/pupilfirst/check-repo-action/blob/main/README.md
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-deep-github-url.outputs.result }}" != "failure" ]; then
+            echo "Action failed to return `failure` for a folder / file URL within a repo"
+            exit 1
+          fi
