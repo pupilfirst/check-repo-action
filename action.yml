@@ -26,7 +26,7 @@ runs:
     - name: Check out the parent repository with student submission data
       uses: actions/checkout@v2
     - name: Extract the student submission repo from URL
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       id: get-repo-name
       continue-on-error: true
       with:
@@ -96,7 +96,7 @@ runs:
     - name: Verify structure of the repo
       if: steps.checkout-repo.outcome == 'success'
       id: verify-structure
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         result-encoding: string
         script: |
@@ -135,7 +135,7 @@ runs:
           ```
     - name: Provide success or failure response from composite action
       id: final-step
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         verifyStructureOutput: ${{ steps.verify-structure.outputs.result }}
         result-encoding: string
