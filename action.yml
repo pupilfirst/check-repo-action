@@ -137,7 +137,6 @@ runs:
       id: final-step
       uses: actions/github-script@v7
       with:
-        verifyStructureOutput: ${{ steps.verify-structure.outputs.result }}
         result-encoding: string
         script: |
           const verifyStructureOutput = "${{ steps.verify-structure.outputs.result }}";
