@@ -32,7 +32,7 @@ runs:
       with:
         result-encoding: string
         script: |
-          const submissionJsonPath = core.getInput("submissionJsonPath");
+          const submissionJsonPath = "${{ submissionJsonPath }}";
           const submission = submissionJsonPath === "" ? require(process.env.GITHUB_WORKSPACE + "/submission.json") : require(process.env.GITHUB_WORKSPACE + "/" + submissionJsonPath);
           const gitURL =  submission.checklist[0].result;
           const regex = /(?:git@|https:\/\/)github.com[:\/]([a-zA-Z0-9\-_.]+\/[a-zA-Z0-9\-_.\/]+)$/g;
@@ -100,8 +100,8 @@ runs:
       with:
         result-encoding: string
         script: |
-          const patterns = core.getMultilineInput("globs", { required: true });
-          const repoPath = core.getInput("repoPath");
+          const patterns = "${{ inputs.globs }}";
+          const repoPath = "${{ repoPath }}";
 
           const missingPaths = await Promise.all(patterns.map(async (pattern) => {
             const prefixedPattern = repoPath === "" ? pattern : repoPath + "/" + pattern;
@@ -140,5 +140,5 @@ runs:
         verifyStructureOutput: ${{ steps.verify-structure.outputs.result }}
         result-encoding: string
         script: |
-          const verifyStructureOutput = ${{ steps.verify-structure.outputs.result }};
+          const verifyStructureOutput = "${{ steps.verify-structure.outputs.result }}";
           return verifyStructureOutput == "" ? "success" : "failure";

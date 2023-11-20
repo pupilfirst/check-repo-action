@@ -12,7 +12,9 @@ jobs:
         id: reject-invalid-url
         uses: ./
         with:
-          globs: 'action.yml\nREADME.md'
+          globs: |-
+            action.yml
+            README.md
           submissionJsonPath: test/invalid-repo.json
           testMode: "true"
       - name: Report result of previous test
@@ -25,7 +27,9 @@ jobs:
         id: reject-deep-github-url
         uses: ./
         with:
-          globs: 'action.yml\nREADME.md'
+          globs: |-
+            action.yml
+            README.md
           submissionJsonPath: test/deep-link.json
           testMode: "true"
       - name: Report result of previous test
