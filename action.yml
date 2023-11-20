@@ -32,7 +32,7 @@ runs:
       with:
         result-encoding: string
         script: |
-          const submissionJsonPath = "${{ submissionJsonPath }}";
+          const submissionJsonPath = "${{ inputs.submissionJsonPath }}";
           const submission = submissionJsonPath === "" ? require(process.env.GITHUB_WORKSPACE + "/submission.json") : require(process.env.GITHUB_WORKSPACE + "/" + submissionJsonPath);
           const gitURL =  submission.checklist[0].result;
           const regex = /(?:git@|https:\/\/)github.com[:\/]([a-zA-Z0-9\-_.]+\/[a-zA-Z0-9\-_.\/]+)$/g;
@@ -101,7 +101,7 @@ runs:
         result-encoding: string
         script: |
           const patterns = "${{ inputs.globs }}";
-          const repoPath = "${{ repoPath }}";
+          const repoPath = "${{ inputs.repoPath }}";
 
           const missingPaths = await Promise.all(patterns.map(async (pattern) => {
             const prefixedPattern = repoPath === "" ? pattern : repoPath + "/" + pattern;
