@@ -100,7 +100,7 @@ runs:
       with:
         result-encoding: string
         script: |
-          const patterns = "${{ inputs.globs }}";
+          const patterns = "${{ inputs.globs }}".split("\n");
           const repoPath = "${{ inputs.repoPath }}";
 
           const missingPaths = await Promise.all(patterns.map(async (pattern) => {
