@@ -98,10 +98,11 @@ runs:
       id: verify-structure
       uses: actions/github-script@v7
       with:
-        result-encoding: string
+        globs: ${{ inputs.globs }}
+        repoPath: ${{ inputs.repoPath }}
         script: |
-          const patterns = "${{ inputs.globs }}".split("\n");
-          const repoPath = "${{ inputs.repoPath }}";
+          const patterns = core.getMultilineInput("globs", { required: true });
+          const repoPath = core.getInput("repoPath");
 
           const missingPaths = await Promise.all(patterns.map(async (pattern) => {
             const prefixedPattern = repoPath === "" ? pattern : repoPath + "/" + pattern;
