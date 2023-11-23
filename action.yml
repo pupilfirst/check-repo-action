@@ -139,12 +139,12 @@ runs:
       with:
         result-encoding: string
         script: |
-          const getRepoNameOutput = "${{ steps.get-repo-name.outputs.result }}";
-
-          if (getRepoNameOutput == "failure") {
+          if ("${{ steps.get-repo-name.outputs.result }}" === "failure") {
             return "failure";
           }
 
-          const verifyStructureOutput = "${{ steps.verify-structure.outputs.result }}";
+          if ("${{ steps.checkout-repo.outcome }}" !== "success") {
+            return "failure";
+          }
 
-          return verifyStructureOutput == "" ? "success" : "failure";
+          return "${{ steps.verify-structure.outputs.result }}" === "" ? "success" : "failure";
