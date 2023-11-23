@@ -44,3 +44,18 @@ jobs:
             echo "Action did not fail for a folder / file URL within a repo"
             exit 1
           fi
+      - name: Action should fail for GitHub repo URL that is inaccessible
+        id: reject-inaccessible-github-url
+        uses: ./
+        with:
+          globs: |-
+            action.yml
+            README.md
+          submissionJsonPath: test/non-existent-repo.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-inaccessible-github-url.outputs.result }}" != "failure" ]; then
+            echo "Action did not fail for an inaccessible GitHub repo URL"
+            exit 1
+          fi
