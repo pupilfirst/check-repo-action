@@ -44,6 +44,7 @@ jobs:
         id: reject-inaccessible-github-url
         uses: ./
         with:
+          repoPath: check-repo-action-clone
           globs: README.md
           submissionJsonPath: test/non-existent-repo.json
           testMode: "true"
