@@ -13,14 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Action should fail for non GitHub repo URLs
         id: reject-invalid-url
         uses: ./
         with:
-          globs: |-
-            action.yml
-            README.md
+          globs: README.md
           submissionJsonPath: test/invalid-repo.json
           testMode: "true"
       - name: Report result of previous test
@@ -33,9 +31,7 @@ jobs:
         id: reject-deep-github-url
         uses: ./
         with:
-          globs: |-
-            action.yml
-            README.md
+          globs: README.md
           submissionJsonPath: test/deep-link.json
           testMode: "true"
       - name: Report result of previous test
@@ -48,9 +44,7 @@ jobs:
         id: reject-inaccessible-github-url
         uses: ./
         with:
-          globs: |-
-            action.yml
-            README.md
+          globs: README.md
           submissionJsonPath: test/non-existent-repo.json
           testMode: "true"
       - name: Report result of previous test
