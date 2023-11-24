@@ -74,7 +74,7 @@ runs:
       with:
         repository: ${{ steps.get-repo-name.outputs.result }}
         path: ${{ inputs.repoPath }}
-    - name: Report invalid repository URL in submission
+    - name: Report inability to clone the repository URL in submission
       if: ${{ steps.get-repo-name.outputs.result != 'failure' && steps.checkout-repo.outcome != 'success' && inputs.testMode == 'false' }}
       uses: pupilfirst/grade-action@v1
       with:
@@ -122,7 +122,7 @@ runs:
           }));
 
           return missingPaths.flat().map(path => "- " + path).join("\n");
-    - name: Report invalid repository URL in submission
+    - name: Report the absence of required files or folders in submitted GitHub repo
       if: ${{ steps.verify-structure.outputs.result != '' && inputs.testMode == 'false' }}
       uses: pupilfirst/grade-action@v1
       with:
