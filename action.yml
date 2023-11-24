@@ -32,8 +32,9 @@ runs:
       with:
         result-encoding: string
         script: |
-          const submissionJsonPath = "${{ inputs.submissionJsonPath }}";
-          const submission = submissionJsonPath === "" ? require(process.env.GITHUB_WORKSPACE + "/submission.json") : require(process.env.GITHUB_WORKSPACE + "/" + submissionJsonPath);
+          const submissionJsonPathOverride = "${{ inputs.submissionJsonPath }}";
+          const submissionJsonPath = submissionJsonPathOverride === "" ? "submission.json" : submissionJsonPathOverride;
+          const submission = require(process.env.GITHUB_WORKSPACE + "/" + submissionJsonPath);
           const gitURL =  submission.checklist[0].result;
           const regex = /(?:git@|https:\/\/)github.com[:\/]([a-zA-Z0-9\-_.]+\/[a-zA-Z0-9\-_.\/]+)$/g;
           const matches = regex.exec(gitURL);
