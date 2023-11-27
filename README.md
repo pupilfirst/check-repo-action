@@ -4,6 +4,7 @@ When a student submission contains a URL to a GitHub repository, the `check_repo
 
 To fetch the repo URL, the action makes the assumption that the first question in the target checklist is asking for the GitHub repo URL. The following steps are performed:
 
+1. The action will consider the first item in the submission checklist as the GitHub repo URL to be checked.
 1. The action will validate the repo URL (that it is, indeed, a GitHub repo URL), and then clones it. By default, it clones to the root path, but this can be customized using the `repoPath` input.
 2. It then checks for the presence of files and folders specified using the `globs` input array.
 
