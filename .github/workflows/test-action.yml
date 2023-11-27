@@ -1,0 +1,105 @@
+name: Test the check-repo action
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Action should fail for non GitHub repo URLs
+        id: reject-invalid-url
+        uses: ./
+        with:
+          globs: README.md
+          submissionJsonPath: test/invalid-repo.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-invalid-url.outputs.result }}" != "failure" ]; then
+            echo "Action did not fail for an invalid URL"
+            exit 1
+          fi
+      - name: Action should fail for URL that is points to a resource inside a repo
+        id: reject-deep-github-url
+        uses: ./
+        with:
+          globs: README.md
+          submissionJsonPath: test/deep-link.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-deep-github-url.outputs.result }}" != "failure" ]; then
+            echo "Action did not fail for a folder / file URL within a repo"
+            exit 1
+          fi
+      - name: Action should fail for GitHub repo URL that is inaccessible
+        id: reject-inaccessible-github-url
+        uses: ./
+        with:
+          repoPath: clone-for-inaccessible-repo-url
+          globs: README.md
+          submissionJsonPath: test/non-existent-repo.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-inaccessible-github-url.outputs.result }}" != "failure" ]; then
+            echo "Action did not fail for an inaccessible GitHub repo URL"
+            exit 1
+          fi
+      - name: Action should fail for a GitHub repo where a file is missing
+        id: reject-github-repo-with-missing-file
+        uses: ./
+        with:
+          repoPath: clone-for-file-missing
+          globs: |-
+            README.md
+            test/this-does-not-exist.json
+          submissionJsonPath: test/valid-repo.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-github-repo-with-missing-file.outputs.result }}" != "failure" ]; then
+          echo "Action did not fail for a GitHub repo with a missing file"
+            exit 1
+          fi
+      - name: Action should fail for a GitHub repo where a folder is missing
+        id: reject-github-repo-with-missing-folder
+        uses: ./
+        with:
+          repoPath: clone-for-folder-missing
+          globs: |-
+            README.md
+            non-existent-folder/*
+          submissionJsonPath: test/valid-repo.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.reject-github-repo-with-missing-folder.outputs.result }}" != "failure" ]; then
+            echo "Action did not fail for a GitHub repo with a missing folder"
+            exit 1
+          fi
+      - name: Action should succeed for a GitHub repo where no files or folders from globs are missing
+        id: accept-github-repo-with-matching-globs
+        uses: ./
+        with:
+          repoPath: clone-for-happy-path
+          globs: |-
+            action.yml
+            README.md
+            test/*
+          submissionJsonPath: test/valid-repo.json
+          testMode: "true"
+      - name: Report result of previous test
+        run: |
+          if [ "${{ steps.accept-github-repo-with-matching-globs.outputs.result }}" != "success" ]; then
+            echo "Action did not succeed for a valid GitHub repo with matching files and folders"
+            exit 1
+          fi

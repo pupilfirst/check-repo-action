@@ -12,6 +12,10 @@ inputs:
     description: Set to true for debugging
     required: false
     default: "false"
+  submissionJsonPath:
+    description: Path to the submission.json file for testing
+    required: false
+    default: ""
 outputs:
   result:
     description: Returns 'success' if all checks pass.
@@ -20,15 +24,17 @@ runs:
   using: composite
   steps:
     - name: Check out the parent repository with student submission data
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Extract the student submission repo from URL
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       id: get-repo-name
       continue-on-error: true
       with:
         result-encoding: string
         script: |
-          const submission = require('./submission.json');
+          const submissionJsonPathOverride = "${{ inputs.submissionJsonPath }}";
+          const submissionJsonPath = submissionJsonPathOverride === "" ? "submission.json" : submissionJsonPathOverride;
+          const submission = require(process.env.GITHUB_WORKSPACE + "/" + submissionJsonPath);
           const gitURL =  submission.checklist[0].result;
           const regex = /(?:git@|https:\/\/)github.com[:\/]([a-zA-Z0-9\-_.]+\/[a-zA-Z0-9\-_.\/]+)$/g;
           const matches = regex.exec(gitURL);
@@ -63,13 +69,13 @@ runs:
           ```
     - name: Check out the repository with submitted code
       if: ${{ steps.get-repo-name.outputs.result != 'failure' }}
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       continue-on-error: true
       id: checkout-repo
       with:
         repository: ${{ steps.get-repo-name.outputs.result }}
         path: ${{ inputs.repoPath }}
-    - name: Report invalid repository URL in submission
+    - name: Report inability to clone the repository URL in submission
       if: ${{ steps.get-repo-name.outputs.result != 'failure' && steps.checkout-repo.outcome != 'success' && inputs.testMode == 'false' }}
       uses: pupilfirst/grade-action@v1
       with:
@@ -91,7 +97,7 @@ runs:
     - name: Verify structure of the repo
       if: steps.checkout-repo.outcome == 'success'
       id: verify-structure
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         globs: ${{ inputs.globs }}
         repoPath: ${{ inputs.repoPath }}
@@ -117,7 +123,7 @@ runs:
           }));
 
           return missingPaths.flat().map(path => "- " + path).join("\n");
-    - name: Report invalid repository URL in submission
+    - name: Report the absence of required files or folders in submitted GitHub repo
       if: ${{ steps.verify-structure.outputs.result != '' && inputs.testMode == 'false' }}
       uses: pupilfirst/grade-action@v1
       with:
@@ -132,9 +138,16 @@ runs:
           ```
     - name: Provide success or failure response from composite action
       id: final-step
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
-        verifyStructureOutput: ${{ steps.verify-structure.outputs.result }}
         result-encoding: string
         script: |
-          return core.getInput("verifyStructureOutput") == "" ? "success" : "failure";
+          if ("${{ steps.get-repo-name.outputs.result }}" === "failure") {
+            return "failure";
+          }
+
+          if ("${{ steps.checkout-repo.outcome }}" !== "success") {
+            return "failure";
+          }
+
+          return "${{ steps.verify-structure.outputs.result }}" === "" ? "success" : "failure";
